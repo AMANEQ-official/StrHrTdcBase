@@ -240,8 +240,8 @@ architecture Behavioral of toplevel is
     end case;
   end function;
 
-  --constant  kPcbVersion : string:= "GN-2006-4";
-  constant  kPcbVersion : string:= "GN-2006-1";
+  constant  kPcbVersion : string:= "GN-2006-4";
+  --constant  kPcbVersion : string:= "GN-2006-1";
 
   function GetMikuIoStd(version: string) return string is
   begin
@@ -427,7 +427,9 @@ architecture Behavioral of toplevel is
   attribute mark_debug of local_fine_offset  : signal is kEnDebugTop;
 
   -- Mikumari Util ------------------------------------------------------------
-  signal cbt_init_from_mutil   : MikuScalarPort;
+  signal cbt_init_from_mutil    : MikuScalarPort;
+  signal rst_from_miku          : std_logic;
+  signal rst_from_miku_xgmii    : std_logic;
 
   -- Scaler -------------------------------------------------------------------
   constant kNumExtraScr : integer:= 2;-- Trigger ++ TrgRejected
@@ -775,8 +777,8 @@ begin
   clk_locked(1) <= CDCE_LOCK;
 
   pwr_on_reset  <= core_master_reset;
-  user_reset    <= system_reset or rst_from_bus or emergency_reset;
-  bct_reset     <= system_reset or emergency_reset;
+  user_reset    <= system_reset or rst_from_bus or rst_from_miku;
+  bct_reset     <= system_reset or rst_from_miku;
 
   force_reset_u <= frst_from_dct(0) or system_reset;
   force_reset_d <= frst_from_dct(1) or system_reset;
@@ -799,6 +801,10 @@ begin
       syncXgmiiReset  => system_reset_xgmii,
       syncSysReset    => system_reset
       );
+
+  u_RstFromMiku : entity mylib.SigStretcher
+    generic map(kLength => 8)
+    port map(clk_slow, laccp_pulse_out(kDownPulseSysRst), rst_from_miku);
 
   u_sync_nimin  : entity mylib.synchronizer port map(clk_slow, NIM_IN(2), sync_nim_in(2));
   u_trg_in      : entity mylib.EdgeDetector port map(clk_slow, sync_nim_in(2), local_trigger_in);
@@ -836,20 +842,8 @@ begin
   miku_rxn(kIdMikuMznD)  <= MZND_CDCM_RXN;
 
   -- MIKUMARI --------------------------------------------------------------------------
-  u_KeepInit : process(system_reset, clk_slow)
-    variable counter   : integer:= 0;
-  begin
-    if(system_reset = '1') then
-      power_on_init   <= '1';
-      counter         := 16#0FFFFFFF#;
-    elsif(clk_slow'event and clk_slow = '1') then
-      if(counter = 0) then
-        power_on_init   <= '0';
-      else
-        counter   := counter -1;
-      end if;
-    end if;
-  end process;
+  u_KeepInit : entity mylib.RstDelayTimer
+    port map(system_reset, X"0FFFFFFF", clk_slow, open, power_on_init );
 
   gen_idleayctrl : for i in 0 to idelayctrl_ready'length-1 generate
     attribute IODELAY_GROUP of u_IDELAYCTRL_inst : label is GetIoDelayGroup(i);
@@ -865,14 +859,15 @@ begin
 
   -- Secondary Links ----------------------------------------------------------------
   laccp_reset(kIdMikuSec) <= system_reset or (not mikumari_link_up(kIdMikuSec));
-  laccp_pulse_in(kDownPulseTrigger) <= local_trigger_in or laccp_pulse_out(kDownPulseTrigger);
-  laccp_pulse_in(kDownPulseCntRst)  <= laccp_pulse_out(kDownPulseCntRst);
-  laccp_pulse_in(kDownPulseRSV2)    <= laccp_pulse_out(kDownPulseRSV2);
-  laccp_pulse_in(kDownPulseRSV3)    <= laccp_pulse_out(kDownPulseRSV3);
-  laccp_pulse_in(kDownPulseRSV4)    <= laccp_pulse_out(kDownPulseRSV4);
-  laccp_pulse_in(kDownPulseRSV5)    <= laccp_pulse_out(kDownPulseRSV5);
-  laccp_pulse_in(kDownPulseRSV6)    <= laccp_pulse_out(kDownPulseRSV6);
-  laccp_pulse_in(kDownPulseRSV7)    <= laccp_pulse_out(kDownPulseRSV7);
+
+  laccp_pulse_in(kDownPulseTrigger)   <= local_trigger_in or laccp_pulse_out(kDownPulseTrigger);
+  laccp_pulse_in(kDownPulseCntRst)    <= laccp_pulse_out(kDownPulseCntRst);
+  laccp_pulse_in(kDownPulseSysRst)    <= laccp_pulse_out(kDownPulseSysRst);
+  laccp_pulse_in(kDownPulseRSV3)      <= laccp_pulse_out(kDownPulseRSV3);
+  laccp_pulse_in(kDownPulseRSV4)      <= laccp_pulse_out(kDownPulseRSV4);
+  laccp_pulse_in(kDownPulseRSV5)      <= laccp_pulse_out(kDownPulseRSV5);
+  laccp_pulse_in(kDownPulseRSV6)      <= laccp_pulse_out(kDownPulseRSV6);
+  laccp_pulse_in(kDownPulseRSV7)      <= laccp_pulse_out(kDownPulseRSV7);
 
   u_Miku_Inst : entity mylib.MikumariBlock
     generic map(
@@ -1335,6 +1330,7 @@ u_LACCP : entity mylib.LaccpMainBlock
       bitslipNumIn        => bitslip_num_out,
       cbtInitOut          => cbt_init_from_mutil,
       tapValueOut         => open,
+      rstOverMikuOut      => open,
 
       -- MIKUMARI Link ports --
       mikuLinkUp          => mikumari_link_up,
@@ -1379,6 +1375,7 @@ u_LACCP : entity mylib.LaccpMainBlock
       rst	                => system_reset,
       cntRst              => laccp_pulse_in(kDownPulseCntRst),
       clk	                => clk_slow,
+      scrRstOut           => open,
 
       -- Module Input --
       hbCount             => (heartbeat_count'range => heartbeat_count, others => '0'),
@@ -1890,6 +1887,8 @@ u_LACCP : entity mylib.LaccpMainBlock
 
 
   -- SiTCP Inst -------------------------------------------------------------
+  u_SyncRstMiku : entity mylib.synchronizer port map(clk_xgmii, rst_from_miku, rst_from_miku_xgmii);
+
   u_SiTCPXG_Inst : WRAP_SiTCPXG_XC7K_128K
     generic map(
       RxBufferSize	=> "LongLong"
@@ -1901,7 +1900,7 @@ u_LACCP : entity mylib.LaccpMainBlock
       --		==== System I/F ====
       FORCE_DEFAULTn            => dip_sw(kSiTCP.Index),
       XGMII_CLOCK               => clk_xgmii,
-      RSTs                      => system_reset_xgmii,
+      RSTs                      => system_reset_xgmii or rst_from_miku_xgmii,
 
       --		==== XGMII I/F ====
       XGMII_RXC 								=> xgmii_rxc,
