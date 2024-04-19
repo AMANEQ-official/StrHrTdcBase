@@ -740,7 +740,7 @@ architecture Behavioral of toplevel is
   -- Clock -------------------------------------------------------------------
   signal c6c_fast, c6c_slow   : std_logic;
   signal clk_fast, clk_slow   : std_logic;
-  signal delay_clk_slow       : std_logic;
+  signal delay_clk_fast       : std_logic;
 
   signal clk_sys            : std_logic;
   signal clk_spi            : std_logic;
@@ -2086,7 +2086,7 @@ u_LACCP : entity mylib.LaccpMainBlock
       DELAY_SRC              => "IDATAIN",   -- Delay input (IDATAIN, DATAIN)
       HIGH_PERFORMANCE_MODE  => "TRUE",      -- Reduced jitter ("TRUE"), Reduced power ("FALSE")
       IDELAY_TYPE            => "FIXED",     -- FIXED, VARIABLE, VAR_LOAD, VAR_LOAD_PIPE
-      IDELAY_VALUE           => 0,           -- Input delay tap setting (0-31)
+      IDELAY_VALUE           => 11,           -- Input delay tap setting (0-31)
       PIPE_SEL               => "FALSE",     -- Select pipelined mode, FALSE, TRUE
       REFCLK_FREQUENCY       => 200.0, -- IDELAYCTRL clock input frequency in MHz (190.0-210.0, 290.0-310.0).
       SIGNAL_PATTERN         => "CLOCK"       -- DATA, CLOCK input signal
@@ -2094,13 +2094,13 @@ u_LACCP : entity mylib.LaccpMainBlock
     port map
     (
       CNTVALUEOUT  => open,                  -- 5-bit output: Counter value output
-      DATAOUT      => delay_clk_slow,  -- 1-bit output: Delayed data output
+      DATAOUT      => delay_clk_fast,  -- 1-bit output: Delayed data output
       C            => clk_sys,                 -- 1-bit input: Clock input
       CE           => '0',                -- 1-bit input: Active high enable increment/decrement input
       CINVCTRL     => '0',                     -- 1-bit input: Dynamic clock inversion input
       CNTVALUEIN   => "00111",                   -- 5-bit input: Counter value input
       DATAIN       => '0',                     -- 1-bit input: Internal delay data input
-      IDATAIN      => c6c_slow,        -- 1-bit input: Data input from the I/O
+      IDATAIN      => c6c_fast,        -- 1-bit input: Data input from the I/O
       INC          => '0',               -- 1-bit input: Increment / Decrement tap delay input
       LD           => '0',               -- 1-bit input: Load IDELAY_VALUE input
       LDPIPEEN     => '0',                     -- 1-bit input: Enable PIPELINE register to load data input
@@ -2110,13 +2110,15 @@ u_LACCP : entity mylib.LaccpMainBlock
   u_BUFG_Fast_inst : BUFG
   port map (
      O => clk_fast, -- 1-bit output: Clock output
-     I => c6c_fast  -- 1-bit input: Clock input
+     --I => c6c_fast  -- 1-bit input: Clock input
+     I => delay_clk_fast  -- 1-bit input: Clock input
   );
 
   u_BUFG_Slow_inst : BUFG
   port map (
      O => clk_slow, -- 1-bit output: Clock output
-     I => delay_clk_slow  -- 1-bit input: Clock input
+     --I => delay_clk_fast  -- 1-bit input: Clock input
+     I => c6c_slow  -- 1-bit input: Clock input
   );
 
 
