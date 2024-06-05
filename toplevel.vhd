@@ -1476,6 +1476,7 @@ u_LACCP : entity mylib.LaccpMainBlock
     (
       -- system port --
       rst           => user_reset,
+      rstBuf        => (not tcp_is_active),
       clk           => clk_slow,
       clkIdelayRef  => clk_gbe,
       idCtrlReady   => and_reduce(idelayctrl_ready),
@@ -1600,6 +1601,7 @@ u_LACCP : entity mylib.LaccpMainBlock
     (
       -- system port --
       rst       => user_reset,
+      rstBuf    => (not tcp_is_active),
       clk       => clk_slow,
       clkIdelayRef  => clk_gbe,
       idCtrlReady   => and_reduce(idelayctrl_ready),
@@ -1649,7 +1651,7 @@ u_LACCP : entity mylib.LaccpMainBlock
   -- BackMerger -------------------------------------------------------
   re_mgr  <= '1' when(empty_mgr = '0' and pfull_link_buf = '0') else '0';
 
-  input_throttling_type2_on   <= status_in_mznu(kIdMznInThrottlingT2) or status_in_mznd(kIdMznInThrottlingT2);
+  --input_throttling_type2_on   <= status_in_mznu(kIdMznInThrottlingT2) or status_in_mznd(kIdMznInThrottlingT2);
 
   status_out_mznu(kIdBaseProgFullBMgr)      <= pfull_back_merger or ddrrx_pfull(0);
   status_out_mznd(kIdBaseProgFullBMgr)      <= pfull_back_merger or ddrrx_pfull(1);
@@ -1657,10 +1659,10 @@ u_LACCP : entity mylib.LaccpMainBlock
   status_out_mznd(kIdBaseHbfNumMismatch)    <= hbfnum_mismatch;
   status_out_mznu(kIdBaseTcpActive)         <= tcp_is_active;
   status_out_mznd(kIdBaseTcpActive)         <= tcp_is_active;
-  status_out_mznu(kIdBaseEmptyLinkBuf)      <= empty_to_tsd;
-  status_out_mznd(kIdBaseEmptyLinkBuf)      <= empty_to_tsd;
-  status_out_mznu(kIdBaseOutThrottling)     <= output_throttling_on;
-  status_out_mznd(kIdBaseOutThrottling)     <= output_throttling_on;
+  status_out_mznu(kIdBaseEmptyLinkBuf)      <= '0';
+  status_out_mznd(kIdBaseEmptyLinkBuf)      <= '0';
+  status_out_mznu(kIdBaseOutThrottling)     <= '0';
+  status_out_mznd(kIdBaseOutThrottling)     <= '0';
 
   u_DSPT : entity mylib.DataSplitter
     generic map(
@@ -1695,9 +1697,10 @@ u_LACCP : entity mylib.LaccpMainBlock
       clk                 => clk_slow,
 
       -- status input --
-      intputThrottlingOn  => input_throttling_type2_on,
-      pfullLinkIn         => pfull_link_buf,
-      emptyLinkIn         => empty_to_tsd,
+      linkActive          => tcp_is_active,
+      --intputThrottlingOn  => input_throttling_type2_on,
+      --pfullLinkIn         => pfull_link_buf,
+      --emptyLinkIn         => empty_to_tsd,
 
       -- status output --
       progFullFifo        => pfull_back_merger,
