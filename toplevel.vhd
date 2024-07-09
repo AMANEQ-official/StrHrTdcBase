@@ -432,8 +432,7 @@ architecture Behavioral of toplevel is
   signal rst_from_miku_xgmii    : std_logic;
 
   -- Scaler -------------------------------------------------------------------
-  constant kNumExtraScr : integer:= 2;-- Trigger ++ TrgRejected
-  constant kMsbScr      : integer:= kNumSysInput+kNumExtraScr+kNumInput-1;
+  constant kMsbScr      : integer:= kNumSysInput+kNumInput-1;
   signal scr_en_in      : std_logic_vector(kMsbScr downto 0);
 
   -- Streaming TDC ------------------------------------------------------------
@@ -647,6 +646,9 @@ architecture Behavioral of toplevel is
   end component;
 
   -- GTX transceiver -----------------------------------------------------------------------
+  constant kPcsBlockLock      : integer:= 0;
+  signal pcs_pma_status       : std_logic_vector(7 downto 0);
+
   --  constant kMiiPhyad      : std_logic_vector(kWidthPhyAddr-1 downto 0):= "00000";
   --  signal mii_init_mdc, mii_init_mdio : std_logic;
 
@@ -1363,13 +1365,14 @@ u_LACCP : entity mylib.LaccpMainBlock
   scr_en_in(kMsbScr - kIndexHbfThrotTime)   <= '0';
   scr_en_in(kMsbScr - kIndexMikuError)      <= (pattern_error(kIdMikuSec) or checksum_err(kIdMikuSec) or frame_broken(kIdMikuSec) or recv_terminated(kIdMikuSec)) and is_ready_for_daq(kIdMikuSec);
 
-  scr_en_in(kNumInput+1)                    <= laccp_pulse_in(kDownPulseTrigger);
-  scr_en_in(kNumInput)                      <= or_reduce(pulse_rejected);
+  scr_en_in(kMsbScr - kIndexTrgReq)         <= laccp_pulse_in(kDownPulseTrigger);
+  scr_en_in(kMsbScr - kIndexTrgRejected)    <= or_reduce(pulse_rejected);
+
   scr_en_in(kNumInput-1 downto 0)           <= (others => '0');
 
   u_SCR: entity mylib.FreeRunScaler
     generic map(
-      kNumHitInput        => kNumInput+kNumExtraScr
+      kNumHitInput        => kNumInput
     )
     port map(
       rst	                => system_reset,
@@ -1890,7 +1893,7 @@ u_LACCP : entity mylib.LaccpMainBlock
 
 
   -- SiTCP Inst -------------------------------------------------------------
-  u_SyncRstMiku : entity mylib.synchronizer port map(clk_xgmii, rst_from_miku, rst_from_miku_xgmii);
+  u_SyncRstMiku : entity mylib.synchronizer port map(clk_xgmii, rst_from_miku or (not pcs_pma_status(kPcsBlockLock)), rst_from_miku_xgmii);
 
   u_SiTCPXG_Inst : WRAP_SiTCPXG_XC7K_128K
     generic map(
@@ -2033,7 +2036,7 @@ u_LACCP : entity mylib.LaccpMainBlock
 
       -- mics --
       pma_pmd_type          => "111",
-      core_status           => open,
+      core_status           => pcs_pma_status,
       sim_speedup_control   => '0',
 
       txusrclk_out          => open,
