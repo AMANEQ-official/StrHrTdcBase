@@ -194,7 +194,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/hdl/utility/scaler/defFreeRunScaler.vhd"]"\
  "[file normalize "$origin_dir/hdl/utility/scaler/FreeRunScaler.vhd"]"\
  "[file normalize "$origin_dir/hdl/laccp/utility/MyDPRamSRRT.vhd"]"\
- "[file normalize "$origin_dir/hdl/laccp/utility/MyDPRamDE.vhd"]"\
+  "[file normalize "$origin_dir/hdl/laccp/utility/MyDPRamDE.vhd"]"\
  "[file normalize "$origin_dir/hdl/laccp/utility/MyFifoComClock.vhd"]"\
  "[file normalize "$origin_dir/hdl/laccp/laccp/HeartBeatUnit.vhd"]"\
  "[file normalize "$origin_dir/hdl/laccp/laccp/defBitwiseOp.vhd"]"\
@@ -416,7 +416,7 @@ set files [list \
  [file normalize "${origin_dir}/hdl/utility/scaler/defFreeRunScaler.vhd"] \
  [file normalize "${origin_dir}/hdl/utility/scaler/FreeRunScaler.vhd"] \
  [file normalize "${origin_dir}/hdl/laccp/utility/MyDPRamSRRT.vhd"] \
- [file normalize "${origin_dir}/hdl/laccp/utility/MyDPRamDE.vhd"] \
+  [file normalize "${origin_dir}/hdl/laccp/utility/MyDPRamDE.vhd"] \
  [file normalize "${origin_dir}/hdl/laccp/utility/MyFifoComClock.vhd"] \
  [file normalize "${origin_dir}/hdl/laccp/laccp/HeartBeatUnit.vhd"] \
  [file normalize "${origin_dir}/hdl/laccp/laccp/defBitwiseOp.vhd"] \
