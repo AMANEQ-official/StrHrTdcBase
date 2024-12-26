@@ -137,7 +137,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/ip/ten_gig_eth_pcs_pma/ten_gig_eth_pcs_pma.xci"]"\
  "[file normalize "$origin_dir/ip/RbcpCdc_SysToLink/RbcpCdc_SysToLink.xci"]"\
  "[file normalize "$origin_dir/ip/RbcpCdc_LinkToSys/RbcpCdc_LinkToSys.xci"]"\
- "[file normalize "$origin_dir/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V3.edf"]"\
+ "[file normalize "$origin_dir/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V4.edf"]"\
  "[file normalize "$origin_dir/ip/fmp_wd_fifo/fmp_wd_fifo.xci"]"\
  "[file normalize "$origin_dir/ip/fmp_rd_fifo/fmp_rd_fifo.xci"]"\
  "[file normalize "$origin_dir/ip/sem_controller/sem_controller.xci"]"\
@@ -148,9 +148,9 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/ip/ddr_buffer/ddr_buffer.xci"]"\
  "[file normalize "$origin_dir/ip/scr_fifo/scr_fifo.xci"]"\
  "[file normalize "$origin_dir/hdl/common/sitcp/MOD_WRAP_SiTCPXG_KC7K.V"]"\
- "[file normalize "$origin_dir/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V3.v"]"\
+ "[file normalize "$origin_dir/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V4.v"]"\
  "[file normalize "$origin_dir/hdl/bbt-sitcp-core/TIMER_SiTCPXG.v"]"\
- "[file normalize "$origin_dir/defBusAddressMap.vhd"]"\
+ "[file normalize "$origin_dir/hdl/defBusAddressMap.vhd"]"\
  "[file normalize "$origin_dir/hdl/common/bus_controller/defBusController.vhd"]"\
  "[file normalize "$origin_dir/hdl/common/main/defSPI_IF.vhd"]"\
  "[file normalize "$origin_dir/hdl/common/bct_bus_bridge/defBctBridge.vhd"]"\
@@ -193,8 +193,10 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/hdl/common/main/FlashMemoryProgrammer.vhd"]"\
  "[file normalize "$origin_dir/hdl/utility/scaler/defFreeRunScaler.vhd"]"\
  "[file normalize "$origin_dir/hdl/utility/scaler/FreeRunScaler.vhd"]"\
+ "[file normalize "$origin_dir/hdl/utility/iom/defIOManager.vhd"]"\
+ "[file normalize "$origin_dir/hdl/utility/iom/IOManager.vhd"]"\
  "[file normalize "$origin_dir/hdl/laccp/utility/MyDPRamSRRT.vhd"]"\
-  "[file normalize "$origin_dir/hdl/laccp/utility/MyDPRamDE.vhd"]"\
+ "[file normalize "$origin_dir/hdl/laccp/utility/MyDPRamDE.vhd"]"\
  "[file normalize "$origin_dir/hdl/laccp/utility/MyFifoComClock.vhd"]"\
  "[file normalize "$origin_dir/hdl/laccp/laccp/HeartBeatUnit.vhd"]"\
  "[file normalize "$origin_dir/hdl/laccp/laccp/defBitwiseOp.vhd"]"\
@@ -230,7 +232,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/hdl/strtdc/hrtdc-impl/defTDC.vhd"]"\
  "[file normalize "$origin_dir/hdl/strtdc/vitalblock/MergerUnit.vhd"]"\
  "[file normalize "$origin_dir/hdl/strtdc/hrtdc-impl/base/vitalblock/VitalBlockBase.vhd"]"\
- "[file normalize "$origin_dir/toplevel.vhd"]"\
+ "[file normalize "$origin_dir/hdl/toplevel.vhd"]"\
  "[file normalize "$origin_dir/constrs/pins.xdc"]"\
  "[file normalize "$origin_dir/constrs/timing.xdc"]"\
  "[file normalize "$origin_dir/constrs/impl.xdc"]"\
@@ -359,7 +361,7 @@ set files [list \
  [file normalize "${origin_dir}/ip/ten_gig_eth_pcs_pma/ten_gig_eth_pcs_pma.xci"] \
  [file normalize "${origin_dir}/ip/RbcpCdc_SysToLink/RbcpCdc_SysToLink.xci"] \
  [file normalize "${origin_dir}/ip/RbcpCdc_LinkToSys/RbcpCdc_LinkToSys.xci"] \
- [file normalize "${origin_dir}/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V3.edf"] \
+ [file normalize "${origin_dir}/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V4.edf"] \
  [file normalize "${origin_dir}/ip/fmp_wd_fifo/fmp_wd_fifo.xci"] \
  [file normalize "${origin_dir}/ip/fmp_rd_fifo/fmp_rd_fifo.xci"] \
  [file normalize "${origin_dir}/ip/sem_controller/sem_controller.xci"] \
@@ -370,9 +372,9 @@ set files [list \
  [file normalize "${origin_dir}/ip/ddr_buffer/ddr_buffer.xci"] \
  [file normalize "${origin_dir}/ip/scr_fifo/scr_fifo.xci"] \
  [file normalize "${origin_dir}/hdl/common/sitcp/MOD_WRAP_SiTCPXG_KC7K.V"] \
- [file normalize "${origin_dir}/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V3.v"] \
+ [file normalize "${origin_dir}/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V4.v"] \
  [file normalize "${origin_dir}/hdl/bbt-sitcp-core/TIMER_SiTCPXG.v"] \
- [file normalize "${origin_dir}/defBusAddressMap.vhd"] \
+ [file normalize "${origin_dir}/hdl/defBusAddressMap.vhd"] \
  [file normalize "${origin_dir}/hdl/common/bus_controller/defBusController.vhd"] \
  [file normalize "${origin_dir}/hdl/common/main/defSPI_IF.vhd"] \
  [file normalize "${origin_dir}/hdl/common/bct_bus_bridge/defBctBridge.vhd"] \
@@ -415,8 +417,10 @@ set files [list \
  [file normalize "${origin_dir}/hdl/common/main/FlashMemoryProgrammer.vhd"] \
  [file normalize "${origin_dir}/hdl/utility/scaler/defFreeRunScaler.vhd"] \
  [file normalize "${origin_dir}/hdl/utility/scaler/FreeRunScaler.vhd"] \
+ [file normalize "${origin_dir}/hdl/utility/iom/defIOManager.vhd"] \
+ [file normalize "${origin_dir}/hdl/utility/iom/IOManager.vhd"] \
  [file normalize "${origin_dir}/hdl/laccp/utility/MyDPRamSRRT.vhd"] \
-  [file normalize "${origin_dir}/hdl/laccp/utility/MyDPRamDE.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/utility/MyDPRamDE.vhd"] \
  [file normalize "${origin_dir}/hdl/laccp/utility/MyFifoComClock.vhd"] \
  [file normalize "${origin_dir}/hdl/laccp/laccp/HeartBeatUnit.vhd"] \
  [file normalize "${origin_dir}/hdl/laccp/laccp/defBitwiseOp.vhd"] \
@@ -452,7 +456,7 @@ set files [list \
  [file normalize "${origin_dir}/hdl/strtdc/hrtdc-impl/defTDC.vhd"] \
  [file normalize "${origin_dir}/hdl/strtdc/vitalblock/MergerUnit.vhd"] \
  [file normalize "${origin_dir}/hdl/strtdc/hrtdc-impl/base/vitalblock/VitalBlockBase.vhd"] \
- [file normalize "${origin_dir}/toplevel.vhd"] \
+ [file normalize "${origin_dir}/hdl/toplevel.vhd"] \
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -497,7 +501,7 @@ if { ![get_property "is_locked" $file_obj] } {
   set_property -name "synth_checkpoint_mode" -value "Singular" -objects $file_obj
 }
 
-set file "$origin_dir/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V3.edf"
+set file "$origin_dir/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V4.edf"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "EDIF" -objects $file_obj
@@ -598,7 +602,7 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "library" -value "mylib" -objects $file_obj
 
-set file "$origin_dir/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V3.v"
+set file "$origin_dir/hdl/bbt-sitcp-core/SiTCPXG_XC7K_128K_V4.v"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "library" -value "mylib" -objects $file_obj
@@ -608,7 +612,7 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "library" -value "mylib" -objects $file_obj
 
-set file "$origin_dir/defBusAddressMap.vhd"
+set file "$origin_dir/hdl/defBusAddressMap.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
@@ -866,6 +870,18 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 set_property -name "library" -value "mylib" -objects $file_obj
 
+set file "$origin_dir/hdl/utility/iom/defIOManager.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL 2008" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/utility/iom/IOManager.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL 2008" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
 set file "$origin_dir/hdl/laccp/utility/MyDPRamSRRT.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
@@ -1088,7 +1104,7 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL 2008" -objects $file_obj
 set_property -name "library" -value "mylib" -objects $file_obj
 
-set file "$origin_dir/toplevel.vhd"
+set file "$origin_dir/hdl/toplevel.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL 2008" -objects $file_obj
