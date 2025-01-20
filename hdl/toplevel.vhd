@@ -247,8 +247,8 @@ architecture Behavioral of toplevel is
     end case;
   end function;
 
-  --constant  kPcbVersion : string:= "GN-2006-4";
-  constant  kPcbVersion : string:= "GN-2006-1";
+  constant  kPcbVersion : string:= "GN-2006-4";
+  --constant  kPcbVersion : string:= "GN-2006-1";
 
   function GetMikuIoStd(version: string) return string is
   begin
@@ -280,7 +280,7 @@ architecture Behavioral of toplevel is
   function GetEnDebug(index: integer) return boolean is
   begin
     case index is
-      when 0  => return true;
+      when 0  => return false;
       when 1  => return false;
       when 2  => return false;
     end case;
