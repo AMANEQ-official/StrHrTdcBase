@@ -173,7 +173,7 @@ end toplevel;
 architecture Behavioral of toplevel is
   attribute mark_debug  : string;
   attribute keep        : string;
-  constant  kEnDebugTop : string:= "false";
+  constant  kEnDebugTop : string:= "true";
 
   -- System ------------------------------------------------------------------
   -- AMANEQ specification
@@ -247,8 +247,8 @@ architecture Behavioral of toplevel is
     end case;
   end function;
 
-  constant  kPcbVersion : string:= "GN-2006-4";
-  --constant  kPcbVersion : string:= "GN-2006-1";
+  --constant  kPcbVersion : string:= "GN-2006-4";
+  constant  kPcbVersion : string:= "GN-2006-1";
 
   function GetMikuIoStd(version: string) return string is
   begin
@@ -341,7 +341,7 @@ architecture Behavioral of toplevel is
   signal bitslip_num_out      : BitslipArrayType(kNumMikumari-1 downto 0);
   signal serdes_offset        : SerdesOfsArrayType(kNumMikumari-1 downto 0);
 
-  attribute mark_debug of power_on_init   : signal is kEnDebugTop;
+  --attribute mark_debug of power_on_init   : signal is kEnDebugTop;
 
   -- Mikumari --
   type MikuDataArray is array(kNumMikumari-1 downto 0) of std_logic_vector(7 downto 0);
@@ -426,12 +426,12 @@ architecture Behavioral of toplevel is
   signal hbf_state_prim           : HbfStateType;
   signal hbf_state_secnd          : HbfStateType;
 
-  attribute mark_debug of is_ready_for_daq   : signal is kEnDebugTop;
-  attribute mark_debug of link_addr_partter  : signal is kEnDebugTop;
-  attribute mark_debug of valid_link_addr    : signal is kEnDebugTop;
-  attribute mark_debug of serdes_offset      : signal is kEnDebugTop;
-  attribute mark_debug of laccp_fine_offset  : signal is kEnDebugTop;
-  attribute mark_debug of local_fine_offset  : signal is kEnDebugTop;
+  --attribute mark_debug of is_ready_for_daq   : signal is kEnDebugTop;
+  --attribute mark_debug of link_addr_partter  : signal is kEnDebugTop;
+  --attribute mark_debug of valid_link_addr    : signal is kEnDebugTop;
+  --attribute mark_debug of serdes_offset      : signal is kEnDebugTop;
+  --attribute mark_debug of laccp_fine_offset  : signal is kEnDebugTop;
+  --attribute mark_debug of local_fine_offset  : signal is kEnDebugTop;
 
   -- Mikumari Util ------------------------------------------------------------
   signal cbt_init_from_mutil    : MikuScalarPort;
@@ -519,10 +519,13 @@ architecture Behavioral of toplevel is
   signal pfull_back_merger  : std_logic;
   signal hbfnum_mismatch    : std_logic;
   signal output_throttling_on : std_logic;
-  signal input_throttling_type2_on  : std_logic;
+  signal recovery_rst_u, recovery_rst_d, recovery_rst  : std_logic;
 
   attribute mark_debug of  pfull_back_merger          : signal is kEnDebugTop;
-  --attribute mark_debug of  input_throttling_type2_on  : signal is kEnDebugTop;
+  attribute mark_debug of  recovery_rst_u             : signal is kEnDebugTop;
+  attribute mark_debug of  recovery_rst_d             : signal is kEnDebugTop;
+  attribute mark_debug of  hbf_num_mismatch           : signal is kEnDebugTop;
+  attribute mark_debug of  output_throttling_on       : signal is kEnDebugTop;
 
   signal din_link_buf       : std_logic_vector(kWidthData-1 downto 0);
   signal pfull_link_buf     : std_logic;
@@ -1693,7 +1696,9 @@ u_LACCP : entity mylib.LaccpMainBlock
   -- BackMerger -------------------------------------------------------
   re_mgr  <= '1' when(empty_mgr = '0' and pfull_link_buf = '0') else '0';
 
-  --input_throttling_type2_on   <= status_in_mznu(kIdMznInThrottlingT2) or status_in_mznd(kIdMznInThrottlingT2);
+  recovery_rst_u   <= status_in_mznu(kIdMznRecoveryRst);
+  recovery_rst_d   <= status_in_mznd(kIdMznRecoveryRst) when(dip_sw(kMznDAbs.index) = '0') else '0';
+  recovery_rst     <= recovery_rst_u or recovery_rst_d;
 
   status_out_mznu(kIdBaseProgFullBMgr)      <= pfull_back_merger or ddrrx_pfull(0);
   status_out_mznd(kIdBaseProgFullBMgr)      <= pfull_back_merger or ddrrx_pfull(1);
@@ -1711,7 +1716,7 @@ u_LACCP : entity mylib.LaccpMainBlock
       kDivisionRatio  => kNumMRGFront
     )
     port map(
-      rst             => user_reset,
+      rst             => user_reset or recovery_rst,
       clk             => clk_slow,
       mznDIsAbsence   => dip_sw(kMznDAbs.index),
       pfullFifo       => ddrrx_pfull,
@@ -1735,7 +1740,7 @@ u_LACCP : entity mylib.LaccpMainBlock
       enDEBUG             => false
     )
     port map(
-      rst                 => user_reset,
+      rst                 => user_reset or recovery_rst,
       clk                 => clk_slow,
 
       -- status input --
