@@ -247,8 +247,8 @@ architecture Behavioral of toplevel is
     end case;
   end function;
 
-  --constant  kPcbVersion : string:= "GN-2006-4";
-  constant  kPcbVersion : string:= "GN-2006-1";
+  constant  kPcbVersion : string:= "GN-2006-4";
+  --constant  kPcbVersion : string:= "GN-2006-1";
 
   function GetMikuIoStd(version: string) return string is
   begin
@@ -760,6 +760,9 @@ architecture Behavioral of toplevel is
   signal c6c_fast, c6c_slow   : std_logic;
   signal clk_fast, clk_slow   : std_logic;
   signal delay_clk_fast       : std_logic;
+  signal clk_sys_div16        : std_logic;
+  signal clk_sys_div16_prim   : std_logic;
+  signal clk_sys_div16_secnd  : std_logic;
 
   signal clk_sys            : std_logic;
   signal clk_spi            : std_logic;
@@ -1252,6 +1255,7 @@ u_LACCP : entity mylib.LaccpMainBlock
   hbf_number        <= hbf_number_prim  when(DIP(kStandAlone.Index) = '1') else hbf_number_secnd;
   hbf_state         <= hbf_state_prim when(DIP(kStandAlone.Index) = '1') else hbf_state_secnd;
     frame_flag_out    <= frame_flag_out_pri when(DIP(kStandAlone.Index) = '1') else frame_flag_out_scnd;
+  clk_sys_div16     <= clk_sys_div16_prim when(DIP(kStandAlone.Index) = '1') else clk_sys_div16_secnd;
 
   frame_ctrl_gate <= '0';
   hbu_reset       <= '1' when(dip_sw(kStandAlone.Index) = '1') else laccp_reset(kIdMikuSec);
@@ -1280,6 +1284,7 @@ u_LACCP : entity mylib.LaccpMainBlock
         heartbeatCount    => heartbeat_count_secnd,
         hbfNumber         => hbf_number_secnd,
         hbfNumMismatch    => hbf_num_mismatch,
+        clkDiv16          => clk_sys_div16_secnd,
 
         hbfFlagsIn        => frame_flag_in,
         frameFlags        => frame_flag_out_scnd,
@@ -1323,6 +1328,7 @@ u_LACCP : entity mylib.LaccpMainBlock
 
         hbfFlagsIn        => frame_flag_in,
         frameFlags        => frame_flag_out_pri,
+        clkDiv16          => clk_sys_div16_prim,
 
         -- DAQ I/F --
         hbfCtrlGateIn     => '0',
@@ -1846,7 +1852,7 @@ u_LACCP : entity mylib.LaccpMainBlock
   intsig_to_iom(2)      <= laccp_pulse_out(kDownPulseTrigger);
   intsig_to_iom(3)      <= frame_flag_out(0);
   intsig_to_iom(4)      <= frame_flag_out(1);
-  intsig_to_iom(5)      <= '1';
+  intsig_to_iom(5)      <= clk_sys_div16;
   intsig_to_iom(6)      <= '1';
   intsig_to_iom(7)      <= '1';
 
