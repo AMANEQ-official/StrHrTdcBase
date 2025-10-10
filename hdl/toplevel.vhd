@@ -247,8 +247,8 @@ architecture Behavioral of toplevel is
     end case;
   end function;
 
-  --constant  kPcbVersion : string:= "GN-2006-4";
-  constant  kPcbVersion : string:= "GN-2006-1";
+  constant  kPcbVersion : string:= "GN-2006-4";
+  --constant  kPcbVersion : string:= "GN-2006-1";
 
   function GetMikuIoStd(version: string) return string is
   begin
@@ -831,12 +831,30 @@ begin
   u_sync_nimin1 : entity mylib.synchronizer port map(clk_slow, NIM_IN(1), sync_nim_in(1));
   u_sync_nimin2 : entity mylib.synchronizer port map(clk_slow, NIM_IN(2), sync_nim_in(2));
 
-  u_nimo_buf : process(clk_slow)
+--  u_nimo_buf : process(clk_slow)
+--  begin
+--    if(clk_slow'event and clk_slow = '1') then
+--      NIM_OUT <= tmp_nim_out;
+--    end if;
+--  end process;
+
+  gen_oddr : for i in 1 to kNumNIM generate
   begin
-    if(clk_slow'event and clk_slow = '1') then
-      NIM_OUT <= tmp_nim_out;
-    end if;
-  end process;
+    u_ODDR : ODDR
+    generic map(
+      DDR_CLK_EDGE => "OPPOSITE_EDGE", -- "OPPOSITE_EDGE" or "SAME_EDGE"
+      INIT => '0',   -- Initial value for Q port ('1' or '0')
+      SRTYPE => "SYNC") -- Reset Type ("ASYNC" or "SYNC")
+    port map (
+      Q => NIM_OUT(i),   -- 1-bit DDR output
+      C => clk_slow,    -- 1-bit clock input
+      CE => '1',  -- 1-bit clock enable input
+      D1 => tmp_nim_out(i),  -- 1-bit data input (positive edge)
+      D2 => tmp_nim_out(i),  -- 1-bit data input (negative edge)
+      R => '0',    -- 1-bit reset input
+      S => '0'     -- 1-bit set input
+    );
+  end generate;
 
   dip_sw <= DIP;
 
@@ -1853,7 +1871,7 @@ u_LACCP : entity mylib.LaccpMainBlock
   intsig_to_iom(3)      <= frame_flag_out(0);
   intsig_to_iom(4)      <= frame_flag_out(1);
   intsig_to_iom(5)      <= clk_sys_div16;
-  intsig_to_iom(6)      <= '1';
+  intsig_to_iom(6)      <= clk_slow;
   intsig_to_iom(7)      <= '1';
 
 
